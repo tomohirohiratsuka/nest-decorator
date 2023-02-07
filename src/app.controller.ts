@@ -1,6 +1,15 @@
-import { Body, Controller, Get, Put, ValidationPipe } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Put,
+  UploadedFile,
+  UseInterceptors,
+  ValidationPipe,
+} from '@nestjs/common';
 import { AppService } from './app.service';
 import CreateRequest from 'src/CreateRequest.dto';
+import { FileInterceptor } from '@nestjs/platform-express';
 
 @Controller()
 export class AppController {
@@ -19,8 +28,17 @@ export class AppController {
   }
 
   @Put('/create-form-data')
+  @UseInterceptors(FileInterceptor('file'))
   async createFormData(
-    @Body(new ValidationPipe({ transform: true })) body: CreateRequest,
+    @Body(
+      new ValidationPipe({
+        transform: true,
+        forbidUnknownValues: false,
+        forbidNonWhitelisted: false,
+      }),
+    )
+    body: CreateRequest,
+    @UploadedFile() file: Express.Multer.File,
   ) {
     return 'success';
   }
